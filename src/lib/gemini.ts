@@ -9,14 +9,13 @@ Topic: ${topic}
 Key Points to cover: ${keyPoints}
 Length: ${length} words (approximate)
 
-You also need to provide ${numImages} image prompts that would be suitable for this blog post.
-The image prompts should be highly detailed, descriptive, and suitable for an AI image generator.
+You also need to provide ${numImages} short, single-word keywords (e.g., 'technology', 'nature', 'business', 'ai', 'data') that represent suitable images for this blog post.
 
 Return the result as a JSON object with the following structure:
 {
   "title": "The blog title",
   "content": "The full blog content in Markdown format. Do not include image placeholders.",
-  "imagePrompts": ["prompt 1", "prompt 2", ...]
+  "imageKeywords": ["keyword1", "keyword2", ...]
 }
 `;
 
@@ -30,44 +29,28 @@ Return the result as a JSON object with the following structure:
         properties: {
           title: { type: Type.STRING },
           content: { type: Type.STRING },
-          imagePrompts: {
+          imageKeywords: {
             type: Type.ARRAY,
             items: { type: Type.STRING }
           }
         },
-        required: ["title", "content", "imagePrompts"]
+        required: ["title", "content", "imageKeywords"]
       }
     }
   });
 
   const result = JSON.parse(response.text || "{}");
   
-  // Generate images in parallel
-  const imageUrls = await Promise.all(
-    (result.imagePrompts || []).slice(0, numImages).map(async (imgPrompt: string) => {
-      try {
-        const imgRes = await ai.models.generateContent({
-          model: 'gemini-2.5-flash-image',
-          contents: { parts: [{ text: imgPrompt }] },
-          config: {
-            imageConfig: { aspectRatio: "16:9", imageSize: "1K" }
-          }
-        });
-        for (const part of imgRes.candidates?.[0]?.content?.parts || []) {
-          if (part.inlineData) {
-            return `data:image/png;base64,${part.inlineData.data}`;
-          }
-        }
-      } catch (e) {
-        console.error("Failed to generate image", e);
-      }
-      return null;
-    })
-  );
+  // Use picsum.photos with the generated keywords for free tier compatibility
+  const imageUrls = (result.imageKeywords || []).slice(0, numImages).map((keyword: string) => {
+    // Clean up the keyword to ensure it's a valid seed
+    const cleanKeyword = keyword.replace(/[^a-zA-Z0-9]/g, '').toLowerCase() || 'blog';
+    return `https://picsum.photos/seed/${cleanKeyword}/1024/768`;
+  });
 
   return {
     title: result.title,
     content: result.content,
-    images: imageUrls.filter(Boolean)
+    images: imageUrls
   };
 }
