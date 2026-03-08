@@ -1,0 +1,5 @@
+{
+  "name": "AI Blog Writer",
+  "description": "A modern AI-powered blog writer with Firebase authentication.",
+  "requestFramePermissions": []
+}
