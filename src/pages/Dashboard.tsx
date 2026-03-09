@@ -160,8 +160,17 @@ export default function Dashboard() {
           <div className="lg:col-span-8">
             <div className="bg-white p-6 sm:p-10 rounded-2xl shadow-sm border border-zinc-200 min-h-[600px]">
               {error && (
-                <div className="bg-red-50 text-red-600 p-4 rounded-xl mb-6">
-                  {error}
+                <div className="bg-red-50 border border-red-200 text-red-700 p-6 rounded-xl mb-6 flex flex-col gap-3">
+                  <div className="flex items-center gap-2 font-semibold text-lg">
+                    <svg className="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                    Generation Error
+                  </div>
+                  <p className="text-red-600">{error}</p>
+                  {(error.includes("API key") || error.includes("rate limit")) && (
+                    <div className="mt-2 text-sm bg-red-100 p-3 rounded-lg text-red-800">
+                      <strong>How to fix:</strong> Open the AI Studio settings (gear icon) and check your Secrets/Environment Variables. Ensure your keys are correct and you haven't exceeded your free tier limits.
+                    </div>
+                  )}
                 </div>
               )}
               
