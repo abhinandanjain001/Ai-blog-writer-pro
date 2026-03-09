@@ -6,6 +6,7 @@ import { motion } from "motion/react";
 import { LogOut, PenTool, Image as ImageIcon, AlignLeft, List, Loader2, Sparkles } from "lucide-react";
 import { generateBlogWithImages } from "../lib/gemini";
 import Markdown from "react-markdown";
+import ChatBot from "../components/ChatBot";
 
 export default function Dashboard() {
   const { currentUser } = useAuth();
@@ -43,7 +44,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-50 font-sans">
+    <div className="min-h-screen bg-zinc-50 font-sans relative">
       <nav className="bg-white border-b border-zinc-200 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
@@ -227,6 +228,14 @@ export default function Dashboard() {
 
         </div>
       </main>
+      
+      <ChatBot 
+        currentBlogContent={result ? `# ${result.title}\n\n${result.content}` : null} 
+        onUpdateBlog={(newContent) => {
+          // Optional: We can implement direct blog updating later if needed
+          console.log("Blog update requested:", newContent);
+        }} 
+      />
     </div>
   );
 }
